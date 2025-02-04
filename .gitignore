@@ -1,0 +1,20 @@
+# Ignore data files
+data/
+outputs/
+
+# Ignore models
+*.pkl
+*.h5
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+
+# Ignore environment files
+venv/
+.env
+.DS_Store
