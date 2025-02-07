@@ -57,3 +57,114 @@
 - Experiment with advanced deep learning models like **LSTM** or **Transformer-based models (e.g., BERT)**.
 - Perform hyperparameter tuning to further improve model performance.
 - Test the model's generalizability on other datasets or domains.
+
+## MLE PART
+
+### 1. Overview
+The Machine Learning Engineering (MLE) part involves containerizing the training and inference processes to ensure reproducibility and ease of deployment. Docker is used to build images and run containers for both phases.
+
+---
+
+### 2. How to Run the Project
+
+#### **Training**
+1. Build the Docker image for training:
+   ```bash
+   docker build -f src/train/Dockerfile -t sentiment-train .
+   ```
+2. Run the container to train the model:
+   ```bash
+   docker run -v ${PWD}/outputs:/app/outputs -v ${PWD}/data:/app/data sentiment-train
+   ```
+3. After execution, the trained model (`best_model.pkl`) and vectorizer (`tfidf_vectorizer.pkl`) will be saved in the `outputs/models/` directory.
+
+#### **Inference**
+1. Build the Docker image for inference:
+   ```bash
+   docker build -f src/inference/Dockerfile --build-arg model_name=best_model.pkl --build-arg vectorizer_name=tfidf_vectorizer.pkl -t sentiment-inference .
+   ```
+2. Run the container to perform inference on the test dataset:
+   ```bash
+   docker run -v ${PWD}/outputs:/app/outputs -v ${PWD}/data:/app/data sentiment-inference --input_file /app/data/raw/test.csv
+   ```
+3. After execution, the following outputs will be saved in the `outputs/predictions/` directory:
+   - **`predictions.csv`**: Contains the reviews and their predicted sentiments.
+   - **`metrics.txt`**: Contains the performance metrics of the model on the test dataset.
+
+---
+
+### 3. Outputs
+The following outputs are generated after running the training and inference containers:
+- **Models (`outputs/models/`)**:
+  - `best_model.pkl`: The trained Logistic Regression model.
+  - `tfidf_vectorizer.pkl`: The vectorizer used for text preprocessing.
+- **Predictions (`outputs/predictions/`)**:
+  - `predictions.csv`: Predicted sentiments for the test dataset.
+  - `metrics.txt`: Evaluation metrics including precision, recall, and F1-score.
+
+---
+
+### 4. Reproducibility
+The outputs (serialized models, predictions, and metrics) are saved to the mounted `outputs/` directory, ensuring reproducibility across different runs and environments.
+
+---
+
+### 5. Quickstart Guide
+#### Train and Inference Locally
+- **Training**:
+  ```bash
+  python src/train/train.py
+  ```
+- **Inference**:
+  ```bash
+  python src/inference/run_inference.py --input_file data/raw/test.csv
+  ```
+
+#### Docker-Based Workflow
+- **Training**:
+  ```bash
+  docker build -f src/train/Dockerfile -t sentiment-train .
+  docker run -v ${PWD}/outputs:/app/outputs -v ${PWD}/data:/app/data sentiment-train
+  ```
+- **Inference**:
+  ```bash
+  docker build -f src/inference/Dockerfile --build-arg model_name=best_model.pkl --build-arg vectorizer_name=tfidf_vectorizer.pkl -t sentiment-inference .
+  docker run -v ${PWD}/outputs:/app/outputs -v ${PWD}/data:/app/data sentiment-inference --input_file /app/data/raw/test.csv
+  ```
+
+---
+
+### 6. Final Metrics
+The performance metrics for the test dataset are as follows:
+
+```plaintext
+negative:
+  precision: 0.8982
+  recall: 0.8806
+  f1-score: 0.8893
+  support: 5000.0000
+positive:
+  precision: 0.8829
+  recall: 0.9002
+  f1-score: 0.8915
+  support: 5000.0000
+accuracy: 0.8904
+macro avg:
+  precision: 0.8906
+  recall: 0.8904
+  f1-score: 0.8904
+  support: 10000.0000
+weighted avg:
+  precision: 0.8906
+  recall: 0.8904
+  f1-score: 0.8904
+  support: 10000.0000
+```
+
+---
+
+### 7. Notes
+- Ensure Docker is installed and running on your system before executing the commands.
+- Adjust paths (`${PWD}` or `/app/...`) as necessary for your environment.
+
+---
